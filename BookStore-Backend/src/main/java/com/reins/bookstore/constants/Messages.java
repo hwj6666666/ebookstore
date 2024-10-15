@@ -17,4 +17,6 @@ public class Messages {
     public static String PARAMS_SHOULD_NOT_BE_EMPTY = "请求参数不得为空！";
     public static String PARAMS_SHOULD_INVALID = "非法的请求参数！";
     public static String UPLOAD_FAILED = "上传失败！";
+    public static String ADD_ORDER_SUCCEED = "添加订单成功！";
+    public static String  PROCESS_ORDER_SUCCEED= "订单处理成功！";
 }

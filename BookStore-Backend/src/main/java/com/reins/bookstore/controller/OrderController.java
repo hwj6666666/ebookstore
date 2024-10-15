@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import static com.reins.bookstore.constants.Messages.ADD_ORDER_SUCCEED;
+
 @RestController
 @RequestMapping("/api/order")
 @Tag(name = "Order", description = "订单相关 API")
@@ -32,7 +34,7 @@ public class OrderController {
   ResponseEntity<ApiResponseBase> placeOrder(@RequestBody OrderInfo orderInfo) {
     OrderMessage orderMessage = new OrderMessage(SessionUtils.getUserId(), orderInfo);
     kafkaTemplate.send("orderTopic", orderMessage);
-    return ResponseEntity.ok(ApiResponseBase.succeed("下单成功", null));
+    return ResponseEntity.ok(ApiResponseBase.succeed(ADD_ORDER_SUCCEED, null));
   }
 
   @GetMapping
