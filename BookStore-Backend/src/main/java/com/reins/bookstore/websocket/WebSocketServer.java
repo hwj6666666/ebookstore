@@ -13,8 +13,7 @@ public class WebSocketServer {
 
   private static final ConcurrentHashMap<String, Session> SESSIONS = new ConcurrentHashMap<>();
 
-  public WebSocketServer() {
-  }
+  public WebSocketServer() {}
 
   public void sendMessage(Session toSession, String message) {
     if (toSession != null) {

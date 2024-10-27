@@ -1,4 +1,4 @@
-import websocketService from "../websocket/WebSocketService";
+import { useWebSocket } from "../websocket/WebSocketContext";
 import { PREFIX, post } from "./common";
 
 export async function login(username, password) {
@@ -7,7 +7,8 @@ export async function login(username, password) {
 
   try {
     result = await post(url, { username, password });
-    websocketService.connect(result.data);
+    const userId = result.data;
+    sessionStorage.setItem("userId", userId);
   } catch (e) {
     console.log(e);
     result = {

@@ -8,17 +8,22 @@ import { BasicLayout } from "../components/layout";
 import { login } from "../service/login";
 import { handleBaseApiResponse } from "../utils/message";
 import websocketService from "../websocket/WebSocketService";
+import { useWebSocket } from "../websocket/WebSocketContext";
 
 const LoginPage = () => {
   const [messageApi, contextHolder] = useMessage();
   const navigate = useNavigate();
+  const { connect } = useWebSocket();
 
   const onSubmit = async (values) => {
     let email = values["username"];
     let password = values["password"];
 
     let res = await login(email, password);
-    handleBaseApiResponse(res, messageApi, () => navigate("/"));
+    handleBaseApiResponse(res, messageApi, () => {
+      connect(res.data);
+      navigate("/");
+    });
   };
 
   return (
