@@ -1,5 +1,6 @@
 package com.reins.bookstore.service;
 
+import com.reins.bookstore.dto.BookDTO;
 import com.reins.bookstore.entity.Book;
 import com.reins.bookstore.models.ApiResponseBase;
 import com.reins.bookstore.models.CommentDTO;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface BookService {
     PagedItems<Book> searchBooks(String tag, String keyword, Integer pageIndex, Integer pageSize);
 
-    Book getBookById(Long id);
+    BookDTO getBookById(Long id);
 
     List<Book> getTop10BestsellingBooks();
 

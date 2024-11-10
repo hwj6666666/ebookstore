@@ -3,6 +3,7 @@ package com.reins.bookstore.service.impl;
 import com.reins.bookstore.constants.Messages;
 import com.reins.bookstore.dao.BookDAO;
 import com.reins.bookstore.dao.CommentDAO;
+import com.reins.bookstore.dto.BookDTO;
 import com.reins.bookstore.entity.Book;
 import com.reins.bookstore.entity.Comment;
 import com.reins.bookstore.entity.Tag;
@@ -38,7 +39,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book getBookById(Long id) {
+    public BookDTO getBookById(Long id) {
         return bookDAO.getById(id);
     }
 

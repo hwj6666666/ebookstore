@@ -1,5 +1,6 @@
 package com.reins.bookstore.dao;
 
+import com.reins.bookstore.dto.BookDTO;
 import com.reins.bookstore.entity.Book;
 import com.reins.bookstore.entity.CartItem;
 import com.reins.bookstore.entity.Tag;
@@ -12,7 +13,7 @@ public interface BookDAO {
 
     Page<Book> searchBooksByTagAndKeyword(String tag, String keyword, Integer pageIndex, Integer pageSize);
 
-    Book getById(Long id);
+    BookDTO getById(Long id);
 
     void updateSales(List<CartItem> cartItems);
 

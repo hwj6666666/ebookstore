@@ -1,5 +1,6 @@
 package com.reins.bookstore.controller;
 
+import com.reins.bookstore.dto.BookDTO;
 import com.reins.bookstore.entity.Book;
 import com.reins.bookstore.models.ApiResponseBase;
 import com.reins.bookstore.models.CommentDTO;
@@ -41,8 +42,8 @@ public class BookController {
 
     @GetMapping("/api/book/{id}")
     @Operation(summary = "根据 ID 获取书籍")
-    ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Book book = bookService.getBookById(id);
+    ResponseEntity<BookDTO> getBookById(@PathVariable Long id) {
+        BookDTO book = bookService.getBookById(id);
         if (book == null) {
             return ResponseEntity.notFound().build();
         }
