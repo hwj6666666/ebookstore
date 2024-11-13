@@ -8,13 +8,12 @@ import com.reins.bookstore.entity.User;
 import com.reins.bookstore.models.OrderInfo;
 import com.reins.bookstore.repository.CartRepository;
 import com.reins.bookstore.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class OrderDAOImpl implements OrderDAO {
@@ -34,7 +33,7 @@ public class OrderDAOImpl implements OrderDAO {
                 orderInfo.getTel(),
                 new Timestamp(System.currentTimeMillis()),
                 new ArrayList<>(),
-                new User(userId)
+                new User(userId),0
         );
         for (CartItem cartItem : items) {
             OrderItem item = new OrderItem(null, cartItem.getBook(), cartItem.getNumber(), order);

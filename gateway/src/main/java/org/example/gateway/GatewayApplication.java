@@ -24,8 +24,9 @@ public class GatewayApplication {
   public RouteLocator myRoutes(RouteLocatorBuilder builder) {
     return builder
         .routes()
+        .route(r -> r.path("/author/**").uri("lb://FETCH-AUTHOR"))
+        .route(r -> r.path("/calculator/**").uri("lb://CALCULATOR"))
         .route(r -> r.path("/**").uri("lb://BOOKSTORE-BACKEND"))
-        .route(r -> r.path("/ws/**").uri("lb://BOOKSTORE-BACKEND"))
         .build();
   }
 }

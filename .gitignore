@@ -6,3 +6,16 @@ eureka/mvnw.cmd
 eureka/mvnw
 eureka/.gitattributes
 eureka/.mvn/wrapper/maven-wrapper.properties
+FetchAuthor/.mvn/wrapper/maven-wrapper.properties
+FetchAuthor/.gitattributes
+FetchAuthor/mvnw
+FetchAuthor/mvnw.cmd
+Calculator/.mvn/wrapper/maven-wrapper.properties
+Calculator/.gitattributes
+Calculator/.gitignore
+Calculator/mvnw
+Calculator/mvnw.cmd
+Calculator/pom.xml
+Calculator/.gitattributes
+Calculator/mvnw
+Calculator/mvnw.cmd

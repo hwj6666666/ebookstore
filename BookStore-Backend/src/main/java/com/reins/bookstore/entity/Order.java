@@ -15,23 +15,25 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "order_tbl")
 public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  Long id;
 
-    String receiver;
+  String receiver;
 
-    String address;
+  String address;
 
-    String tel;
+  String tel;
 
-    Timestamp createdAt;
+  Timestamp createdAt;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<OrderItem> items;
+  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+  List<OrderItem> items;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonIgnore
-    @JoinColumn(name = "userId", referencedColumnName = "id")
-    User user;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JsonIgnore
+  @JoinColumn(name = "userId", referencedColumnName = "id")
+  User user;
+
+  @Transient Integer total;
 }
