@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { BasicLayout } from "../components/layout";
 import { login } from "../service/login";
 import { handleBaseApiResponse } from "../utils/message";
-import websocketService from "../websocket/WebSocketService";
 import { useWebSocket } from "../websocket/WebSocketContext";
 
 const LoginPage = () => {

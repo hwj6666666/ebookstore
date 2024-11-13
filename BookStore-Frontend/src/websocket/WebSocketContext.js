@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { message } from "antd";
 
 const WebSocketContext = createContext(null);
@@ -8,7 +14,8 @@ export const WebSocketProvider = ({ children }) => {
 
   const connect = (userId) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
-      const newSocket = new WebSocket(`wss://localhost:8080/bookstore/${userId}`);
+      const websocketUrl = `${process.env.REACT_APP_WEBSOCKET_URL}/${userId}`;
+      const newSocket = new WebSocket(websocketUrl);
 
       newSocket.onopen = () => {
         console.log("WebSocket 连接已打开");
@@ -50,7 +57,9 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   return (
-    <WebSocketContext.Provider value={{ socket: socketRef.current, connect, close }}>
+    <WebSocketContext.Provider
+      value={{ socket: socketRef.current, connect, close }}
+    >
       {children}
     </WebSocketContext.Provider>
   );

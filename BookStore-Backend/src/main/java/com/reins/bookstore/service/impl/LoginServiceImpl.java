@@ -20,6 +20,7 @@ public class LoginServiceImpl implements LoginService {
         UserAuth auth = userDAO.getAuth(request.getUsername());
         boolean succeed = auth != null && Objects.equals(auth.getPassword(), request.getPassword());
         if (succeed) {
+            System.out.println("Session set success!");
             SessionUtils.setSession(auth);
         }
         return succeed;

@@ -8,16 +8,23 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class SessionInterceptor implements HandlerInterceptor {
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            return true;
-        }
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("userId") != null) {
-            return true;
-        }
-        response.setStatus(401);
-        return false;
+  @Override
+  public boolean preHandle(
+      HttpServletRequest request, HttpServletResponse response, Object handler) {
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      return true;
     }
+    HttpSession session = request.getSession(false);
+
+    if (session == null) {
+      System.out.println("Session is null");
+    }
+
+    if (session != null && session.getAttribute("userId") != null) {
+      return true;
+    }
+    response.setStatus(401);
+    System.out.println("Unauthorized");
+    return false;
+  }
 }
