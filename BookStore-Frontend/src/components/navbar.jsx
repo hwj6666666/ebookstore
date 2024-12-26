@@ -45,6 +45,7 @@ export default function NavBar({ user }) {
   const handleMenuClick = async (e) => {
     if (e.key === "/logout") {
       let res = await logout();
+      console.log("登录时间为"+res.data);
       handleBaseApiResponse(res, messageApi, () => {
         close();
         navigate("/login");
