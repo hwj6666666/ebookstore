@@ -45,6 +45,8 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   data:
+    mongodb:
+      uri: mongodb://root:123456@localhost:27017/bookstore
     redis:
       host: localhost
       port: 6666
