@@ -58,6 +58,11 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: 123456
 
 springdoc:
   api-docs:

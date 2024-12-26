@@ -2,12 +2,10 @@ package com.reins.bookstore.dao.impl;
 
 import com.reins.bookstore.dao.BookDAO;
 import com.reins.bookstore.dto.BookDTO;
-import com.reins.bookstore.entity.Book;
-import com.reins.bookstore.entity.BookCover; // 引入 BookCover
-import com.reins.bookstore.entity.CartItem;
-import com.reins.bookstore.entity.Tag;
+import com.reins.bookstore.entity.*;
 import com.reins.bookstore.repository.BookCoverRepository;
 import com.reins.bookstore.repository.BookRepository;
+import com.reins.bookstore.repository.BookTagRepository;
 import com.reins.bookstore.repository.TagRepository;
 import java.util.List;
 import java.util.Optional;
@@ -33,69 +31,71 @@ public class BookDAOImpl implements BookDAO {
 
   @Autowired BookRepository bookRepository;
   @Autowired BookCoverRepository bookCoverRepository; // 注入 BookCoverRepository
+  @Autowired BookTagRepository bookTagRepository;
   @Autowired TagRepository tagRepository;
   @Autowired private RedisTemplate<String, Object> redisTemplate;
 
   @Override
   public Page<Book> searchBooksByKeyword(String keyword, Integer pageIndex, Integer pageSize) {
+
     Pageable pageable = PageRequest.of(pageIndex, pageSize);
     String wrapped = "%" + keyword + "%";
     // 查询书籍
-    Page<Book> booksPage = bookRepository.findAllByAuthorLikeOrTitleLike(wrapped, wrapped, pageable);
+    Page<Book> booksPage =
+        bookRepository.findAllByAuthorLikeOrTitleLike(wrapped, wrapped, pageable);
 
     // 为每本书填充 cover 字段
-    List<Book> bookList = booksPage.getContent().stream().map(book -> {
-      // 使用 Optional 和 isPresent 查找 bookCover
-      Optional<BookCover> bookCover = bookCoverRepository.findByBookId(book.getId().intValue());
+    List<Book> bookList =
+        booksPage.getContent().stream()
+            .map(
+                book -> {
+                  // 使用 Optional 和 isPresent 查找 bookCover
+                  Optional<BookCover> bookCover =
+                      bookCoverRepository.findByBookId(book.getId().intValue());
 
-      // 判断是否存在 cover
-      if (bookCover.isPresent()) {
-        // 如果存在，设置 cover
-        book.setCover(bookCover.get().getCover());
-        logger.info("Cover found for book id: {}", book.getId());
-      } else {
-        // 如果不存在，设置 cover 为 null
-        book.setCover(null);
-        logger.info("Cover not found for book id: {}", book.getId());
-      }
+                  // 判断是否存在 cover
+                  if (bookCover.isPresent()) {
+                    // 如果存在，设置 cover
+                    book.setCover(bookCover.get().getCover());
+                    logger.info("Cover found for book id: {}", book.getId());
+                  } else {
+                    // 如果不存在，设置 cover 为 null
+                    book.setCover(null);
+                    logger.info("Cover not found for book id: {}", book.getId());
+                  }
 
-      return book;
-    }).collect(Collectors.toList());
+                  return book;
+                })
+            .collect(Collectors.toList());
 
     // 返回分页的 Book 对象
     return new PageImpl<>(bookList, pageable, booksPage.getTotalElements());
   }
 
   @Override
-  public Page<Book> searchBooksByTagAndKeyword(String tag, String keyword, Integer pageIndex, Integer pageSize) {
+  public Page<Book> searchBooksByTagAndKeyword(
+      String tag, String keyword, Integer pageIndex, Integer pageSize) {
     Pageable pageable = PageRequest.of(pageIndex, pageSize);
-    String wrapped = "%" + keyword + "%";
-    Tag tagEntity = tagRepository.findByName(tag);
 
-    // 查询书籍
-    Page<Book> booksPage = bookRepository.findAllByAuthorLikeOrTitleLikeAndTagsContaining(wrapped, wrapped, tagEntity, pageable);
+    // Step 1: Get a page of books by keyword
+    Page<Book> booksPage = searchBooksByKeyword(keyword, pageIndex, pageSize);
 
-    // 为每本书填充 cover 字段
-    List<Book> bookList = booksPage.getContent().stream().map(book -> {
-      // 使用 Optional 和 isPresent 查找 bookCover
-      Optional<BookCover> bookCover = bookCoverRepository.findByBookId(book.getId().intValue());
+    // Step 2: Get the list of book IDs by tag
+    List<String> bookTags = bookTagRepository.findRelatedTagsByTagName(tag);
+    List<Integer> bookIdsByTag = bookTagRepository.findBooksByTags(bookTags);
+    if (bookIdsByTag.isEmpty()) {
+      System.out.println("bookIds.ByTag is empty");
+    }
+    bookIdsByTag.forEach(bookId -> System.out.println("Book ID: " + bookId));
 
-      // 判断是否存在 cover
-      if (bookCover.isPresent()) {
-        // 如果存在，设置 cover
-        book.setCover(bookCover.get().getCover());
-        logger.info("Cover found for book id: {}", book.getId());
-      } else {
-        // 如果不存在，设置 cover 为 null
-        book.setCover(null);
-        logger.info("Cover not found for book id: {}", book.getId());
-      }
+    // Step 3: Filter the books to include only those whose IDs are in the list of book IDs by tag
+    List<Book> filteredBooks =
+        booksPage.getContent().stream()
+            .filter(book -> bookIdsByTag.contains(book.getId().intValue()))
+            .collect(Collectors.toList());
 
-      return book;
-    }).collect(Collectors.toList());
-
-    // 返回分页的 Book 对象
-    return new PageImpl<>(bookList, pageable, booksPage.getTotalElements());
+    // Return the filtered books as a new Page object
+    return new PageImpl<>(filteredBooks, pageable, booksPage.getTotalElements());
   }
 
   @Override
@@ -122,10 +122,12 @@ public class BookDAOImpl implements BookDAO {
       String cover = (bookCover.isPresent()) ? bookCover.get().getCover() : null;
 
       // 获取标签信息
-      List<String> tagNames = book.getTags().stream().map(Tag::getName).collect(Collectors.toList());
+      List<String> tagNames =
+          book.getTags().stream().map(Tag::getName).collect(Collectors.toList());
 
       // 创建 BookDTO 对象
-      bookDTO = new BookDTO(
+      bookDTO =
+          new BookDTO(
               book.getId(),
               book.getTitle(),
               book.getAuthor(),
@@ -133,8 +135,7 @@ public class BookDAOImpl implements BookDAO {
               book.getPrice(),
               cover, // 从 MongoDB 获取 cover
               book.getSales(),
-              tagNames
-      );
+              tagNames);
 
       // 尝试将结果存入 Redis
       try {
@@ -166,10 +167,12 @@ public class BookDAOImpl implements BookDAO {
       String cover = (bookCover.isPresent()) ? bookCover.get().getCover() : null;
 
       // 获取标签信息
-      List<String> tagNames = book.getTags().stream().map(Tag::getName).collect(Collectors.toList());
+      List<String> tagNames =
+          book.getTags().stream().map(Tag::getName).collect(Collectors.toList());
 
       // 创建新的 BookDTO 对象
-      BookDTO bookDTO = new BookDTO(
+      BookDTO bookDTO =
+          new BookDTO(
               book.getId(),
               book.getTitle(),
               book.getAuthor(),
@@ -177,8 +180,7 @@ public class BookDAOImpl implements BookDAO {
               book.getPrice(),
               cover, // 从 MongoDB 获取 cover
               book.getSales(),
-              tagNames
-      );
+              tagNames);
 
       String cacheKey = BOOK_CACHE_KEY_PREFIX + book.getId();
       try {
@@ -205,23 +207,28 @@ public class BookDAOImpl implements BookDAO {
     List<Book> topBooks = bookRepository.findTop10ByOrderBySalesDesc();
 
     // 为每本书填充 cover 字段
-    topBooks = topBooks.stream().map(book -> {
-      // 使用 Optional 和 isPresent 查找 bookCover
-      Optional<BookCover> bookCover = bookCoverRepository.findByBookId(book.getId().intValue());
+    topBooks =
+        topBooks.stream()
+            .map(
+                book -> {
+                  // 使用 Optional 和 isPresent 查找 bookCover
+                  Optional<BookCover> bookCover =
+                      bookCoverRepository.findByBookId(book.getId().intValue());
 
-      // 判断是否存在 cover
-      if (bookCover.isPresent()) {
-        // 如果存在，设置 cover
-        book.setCover(bookCover.get().getCover());
-        logger.info("Cover found for book id: {}", book.getId());
-      } else {
-        // 如果不存在，设置 cover 为 null
-        book.setCover(null);
-        logger.info("Cover not found for book id: {}", book.getId());
-      }
+                  // 判断是否存在 cover
+                  if (bookCover.isPresent()) {
+                    // 如果存在，设置 cover
+                    book.setCover(bookCover.get().getCover());
+                    logger.info("Cover found for book id: {}", book.getId());
+                  } else {
+                    // 如果不存在，设置 cover 为 null
+                    book.setCover(null);
+                    logger.info("Cover not found for book id: {}", book.getId());
+                  }
 
-      return book;
-    }).collect(Collectors.toList());
+                  return book;
+                })
+            .collect(Collectors.toList());
 
     return topBooks;
   }

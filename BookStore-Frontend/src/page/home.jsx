@@ -48,7 +48,9 @@ export default function HomePage() {
   }, [selectedTag, keyword, pageIndex, pageSize]);
 
   useEffect(() => {
-    getAllBookTags().then(setTags);
+    // 设置标签为 tag1 到 tag12
+    const tags = Array.from({ length: 12 }, (_, i) => `tag${i + 1}`);
+    setTags(tags);
   }, []);
 
   const handleSearch = (keyword) => {
@@ -64,7 +66,7 @@ export default function HomePage() {
   };
 
   const handleSelectTag = (tag) => {
-    setSelectedTag(tag);
+    setSelectedTag(tag || "");
     setSearchParams({ keyword, pageIndex: 0, pageSize });
     searchRef.current?.focus();
   };
@@ -112,6 +114,7 @@ export default function HomePage() {
                     标签
                   </Space>
                 }
+                allowClear
                 options={tags.map((tag) => ({
                   label: <Tag>{tag}</Tag>,
                   value: tag,
