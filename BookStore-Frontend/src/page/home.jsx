@@ -71,6 +71,35 @@ export default function HomePage() {
     searchRef.current?.focus();
   };
 
+  const handleGraphQLSearch = async (title) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/graphql`,
+        {
+          query: `
+            query {
+              getBookByTitle(title: "${title}") {
+                title
+                author
+                price
+              }
+            }
+          `,
+        }
+      );
+      const book = response.data?.data?.getBookByTitle;
+      if (book) {
+        message.success(
+          `书名: ${book.title}, 作者: ${book.author}, 价格: ${book.price}`
+        );
+      } else {
+        message.error("未查询到书籍");
+      }
+    } catch (error) {
+      message.error("查询失败");
+    }
+  };
+
   const handleAuthorSearch = async (title) => {
     try {
       const response = await axios.get(
@@ -95,7 +124,15 @@ export default function HomePage() {
       <Card className="card-container">
         <Space direction="vertical" size="large" style={{ width: "100%" }}>
           <Row justify={"center"} gutter={10}>
-            <Col span={8}>
+            <Col span={6}>
+              <Search
+                placeholder="输入书名（GraphQL 查询）"
+                onSearch={handleGraphQLSearch}
+                enterButton="查询书籍"
+                size="large"
+              />
+            </Col>
+            <Col span={6}>
               <Search
                 ref={searchRef}
                 placeholder="输入关键字"
@@ -104,7 +141,7 @@ export default function HomePage() {
                 size="large"
               />
             </Col>
-            <Col span={2}>
+            <Col span={4}>
               <Select
                 size="large"
                 style={{ width: "100%" }}

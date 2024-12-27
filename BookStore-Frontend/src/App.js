@@ -1,5 +1,11 @@
 import { ConfigProvider, theme } from "antd";
 import AppRouter from "./components/router";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+
+const client = new ApolloClient({
+  uri: "http://localhost:8070/graphql",
+  cache: new InMemoryCache(),
+});
 
 function App() {
   const themeToken = {
@@ -8,14 +14,16 @@ function App() {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: theme.defaultAlgorithm,
-        token: themeToken,
-      }}
-    >
-      <AppRouter />
-    </ConfigProvider>
+    <ApolloProvider client={client}>
+      <ConfigProvider
+        theme={{
+          algorithm: theme.defaultAlgorithm,
+          token: themeToken,
+        }}
+      >
+        <AppRouter />
+      </ConfigProvider>
+    </ApolloProvider>
   );
 }
 

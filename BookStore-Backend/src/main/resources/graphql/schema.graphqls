@@ -1,0 +1,9 @@
+type Query{
+    getBookByTitle(title: String!): GraphQLBook
+}
+
+type GraphQLBook{
+    title: String
+    author: String
+    price : Int
+}

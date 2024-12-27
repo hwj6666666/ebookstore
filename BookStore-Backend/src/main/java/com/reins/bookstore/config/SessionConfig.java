@@ -20,7 +20,8 @@ public class SessionConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/api-docs")
                 .excludePathPatterns("/api/user/avatars/*")
                 .excludePathPatterns("/**/*.js")
-                .excludePathPatterns("/**/*.css");
+                .excludePathPatterns("/**/*.css")
+                .excludePathPatterns("/graphql");
     }
 
     //the Cors Configuration has been moved to the gateway

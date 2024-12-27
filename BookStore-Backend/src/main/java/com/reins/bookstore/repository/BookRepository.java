@@ -11,15 +11,17 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
-    Page<Book> findAllByAuthorLikeOrTitleLike(String author, String title, Pageable pageable);
+  Page<Book> findAllByAuthorLikeOrTitleLike(String author, String title, Pageable pageable);
 
-    @Query("SELECT b FROM Book b JOIN b.tags t WHERE (b.author LIKE %:author% OR b.title LIKE %:title%) AND t = :tag")
-    Page<Book> findAllByAuthorLikeOrTitleLikeAndTagsContaining(
-            @Param("author") String author,
-            @Param("title") String title,
-            @Param("tag") Tag tag,
-            Pageable pageable
-    );
+  @Query(
+      "SELECT b FROM Book b JOIN b.tags t WHERE (b.author LIKE %:author% OR b.title LIKE %:title%) AND t = :tag")
+  Page<Book> findAllByAuthorLikeOrTitleLikeAndTagsContaining(
+      @Param("author") String author,
+      @Param("title") String title,
+      @Param("tag") Tag tag,
+      Pageable pageable);
 
-    List<Book> findTop10ByOrderBySalesDesc();
+  List<Book> findTop10ByOrderBySalesDesc();
+
+  Book findBookByTitle(String title);
 }
